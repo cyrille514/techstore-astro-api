@@ -1,0 +1,314 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import PaymentModal from '../components/PaymentModal.astro';
+---
+
+<Layout title="TechStore - Catálogo API & Carrito">
+  <Header />
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- BARRE DE FILTRES ET RECHERCHE -->
+    <div class="mb-6">
+      <h2 class="text-2xl font-black text-slate-900">Nuestros Productos</h2>
+      <p class="text-xs text-slate-500 font-medium mb-4">Catálogo sincronizado mediante API RESTful.</p>
+
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div id="category-filters" class="flex flex-wrap items-center gap-2">
+          <button data-category="Todos" class="cat-btn bg-slate-900 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Todos</button>
+          <button data-category="Portátiles" class="cat-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Portátiles</button>
+          <button data-category="Periféricos" class="cat-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Periféricos</button>
+          <button data-category="Accesorios" class="cat-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all">Accesorios</button>
+        </div>
+
+        <div class="relative w-full sm:w-64">
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Buscar producto..." 
+            class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 text-slate-700 placeholder-slate-400"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- CATALOGUE & PANIER -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      
+      <!-- GRILLE PRODUITS -->
+      <div id="products-grid" class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="col-span-2 text-center py-12 text-slate-400 text-xs font-semibold">
+          Cargando datos desde la API...
+        </div>
+      </div>
+
+      <!-- PANIER ET CAISSE -->
+      <div class="bg-emerald-100/60 border border-emerald-200/80 rounded-2xl p-4 sticky top-20">
+        
+        <!-- PANIER LISTE -->
+        <div id="cart-view-items">
+          <div class="flex items-center justify-between pb-3 border-b border-emerald-200/60 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🛒</span>
+              <h3 class="font-bold text-slate-800 text-sm">Tu Carrito</h3>
+              <span id="cart-badge" class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+            </div>
+            <button id="clear-cart-btn" class="text-xs text-rose-600 font-bold hover:underline">Vaciar Carrito</button>
+          </div>
+
+          <div id="cart-items" class="space-y-2 max-h-60 overflow-y-auto pr-1 mb-4"></div>
+
+          <div class="pt-3 border-t border-emerald-200/60 flex items-center justify-between mb-4">
+            <span class="font-bold text-slate-800 text-sm">Total:</span>
+            <span id="cart-total" class="font-black text-indigo-600 text-base">0.00 €</span>
+          </div>
+
+          <button 
+            id="checkout-btn" 
+            class="w-full bg-slate-200 text-slate-400 font-bold py-2.5 rounded-xl text-xs transition-all cursor-not-allowed" 
+            disabled
+          >
+            Procesar Pago
+          </button>
+        </div>
+
+        <!-- FORMULAIRE PAIEMENT -->
+        <div id="cart-view-checkout" class="hidden">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+            <h3 class="font-bold text-slate-800 text-sm">Método de Pago</h3>
+            <button id="back-to-cart-btn" class="text-xs text-indigo-600 font-bold hover:underline">← Volver</button>
+          </div>
+
+          <form id="payment-form" class="space-y-3">
+            <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl text-center text-[10px] font-bold text-slate-600">
+              <label class="cursor-pointer">
+                <input type="radio" name="payment-method" value="card" class="peer hidden" checked />
+                <div class="py-1.5 rounded-lg peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm">💳 Tarjeta</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="payment-method" value="paypal" class="peer hidden" />
+                <div class="py-1.5 rounded-lg peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm">🅿️ PayPal</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="payment-method" value="bizum" class="peer hidden" />
+                <div class="py-1.5 rounded-lg peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm">📱 Bizum</div>
+              </label>
+            </div>
+
+            <div id="method-card-fields" class="space-y-2 text-xs">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Titular de la Tarjeta</label>
+                <input type="text" placeholder="Juan Pérez" class="w-full border border-slate-200 rounded-lg p-2 focus:outline-none focus:border-indigo-500 bg-white" required />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Número de Tarjeta</label>
+                <input type="text" placeholder="4532 **** **** 8901" class="w-full border border-slate-200 rounded-lg p-2 focus:outline-none focus:border-indigo-500 bg-white" required />
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Expiración</label>
+                  <input type="text" placeholder="MM/AA" class="w-full border border-slate-200 rounded-lg p-2 focus:outline-none focus:border-indigo-500 bg-white" required />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-0.5">CVC</label>
+                  <input type="text" placeholder="123" class="w-full border border-slate-200 rounded-lg p-2 focus:outline-none focus:border-indigo-500 bg-white" required />
+                </div>
+              </div>
+            </div>
+
+            <div id="method-paypal-fields" class="hidden text-xs text-slate-500 bg-white p-3 rounded-xl border border-slate-100 text-center">
+              Serás redirigido a la plataforma segura de PayPal para confirmar el pago.
+            </div>
+
+            <div id="method-bizum-fields" class="hidden space-y-2 text-xs">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Número de Teléfono</label>
+                <input type="tel" placeholder="600 000 000" class="w-full border border-slate-200 rounded-lg p-2 focus:outline-none focus:border-indigo-500 bg-white" />
+              </div>
+            </div>
+
+            <button type="submit" id="pay-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1">
+              🔒 Pagar <span id="pay-amount">0.00 €</span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <PaymentModal />
+</Layout>
+
+<script>
+  import { store } from '../scripts/store.js';
+  import { setupPaymentUI } from '../scripts/payment.js';
+  import { createProductCardHTML, createCartItemHTML } from '../scripts/templates.js';
+
+  let selectedCategory = 'Todos';
+  let searchQuery = '';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    setupPaymentUI();
+
+    store.subscribe(() => {
+      renderProducts();
+      renderCart();
+    });
+
+    await store.init();
+
+    // Filtres par catégorie
+    const catButtons = document.querySelectorAll('.cat-btn');
+    catButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        selectedCategory = target.dataset.category || 'Todos';
+
+        catButtons.forEach(b => {
+          b.className = 'cat-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all';
+        });
+        target.className = 'cat-btn bg-slate-900 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all';
+
+        renderProducts();
+      });
+    });
+
+    // Barre de recherche
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = (e.target as HTMLInputElement).value.toLowerCase();
+      renderProducts();
+    });
+
+    // Navigation Panier / Caisse
+    document.getElementById('checkout-btn')?.addEventListener('click', () => {
+      if (store.cart.length > 0) {
+        document.getElementById('cart-view-items')?.classList.add('hidden');
+        document.getElementById('cart-view-checkout')?.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('back-to-cart-btn')?.addEventListener('click', () => {
+      document.getElementById('cart-view-checkout')?.classList.add('hidden');
+      document.getElementById('cart-view-items')?.classList.remove('hidden');
+    });
+
+    document.getElementById('clear-cart-btn')?.addEventListener('click', () => store.clearCart());
+
+    // Modale "Nuevo Producto"
+    const modal = document.getElementById('product-modal');
+    const form = document.getElementById('add-product-form') as HTMLFormElement;
+
+    document.getElementById('open-product-modal-btn')?.addEventListener('click', () => modal?.classList.remove('hidden'));
+    document.getElementById('close-modal-btn')?.addEventListener('click', () => modal?.classList.add('hidden'));
+    document.getElementById('cancel-modal-btn')?.addEventListener('click', () => modal?.classList.add('hidden'));
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = (document.getElementById('prod-name') as HTMLInputElement).value;
+      const price = parseFloat((document.getElementById('prod-price') as HTMLInputElement).value);
+      const stock = parseInt((document.getElementById('prod-stock') as HTMLInputElement).value, 10);
+      const category = (document.getElementById('prod-category') as HTMLSelectElement).value;
+
+      // Récupération des deux inputs image
+      const fileInput = document.getElementById('prod-image-file') as HTMLInputElement;
+      const urlInput = document.getElementById('prod-image-url') as HTMLInputElement;
+
+      let finalImageUrl = '';
+
+      // 1. Si un fichier local a été téléchargé
+      if (fileInput.files && fileInput.files[0]) {
+        finalImageUrl = URL.createObjectURL(fileInput.files[0]);
+      } 
+      // 2. Sinon si une URL a été saisie
+      else if (urlInput.value.trim() !== '') {
+        finalImageUrl = urlInput.value.trim();
+      } 
+      // 3. Image par défaut selon la catégorie si rien n'est renseigné
+      else {
+        const imageMap: Record<string, string> = {
+          'Portátiles': '/images/laptop.jpg',
+          'Periféricos': '/images/mouse.jpg',
+          'Accesorios': '/images/keyboard.jpg'
+        };
+        finalImageUrl = imageMap[category] || '/images/default.jpg';
+      }
+
+      // Ajout du produit au store
+      await store.addProduct({
+        name,
+        price,
+        stock,
+        category,
+        image: finalImageUrl
+      });
+
+      form.reset();
+      modal?.classList.add('hidden');
+    });
+  });
+
+  function renderProducts() {
+    const grid = document.getElementById('products-grid');
+    if (!grid) return;
+
+    let filtered = store.products;
+
+    if (selectedCategory !== 'Todos') {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery));
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="col-span-2 text-center py-12 text-slate-400 text-xs font-semibold">No se encontraron productos.</div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(product => createProductCardHTML(product)).join('');
+  }
+
+  function renderCart() {
+    const cartItems = document.getElementById('cart-items');
+    const cartBadge = document.getElementById('cart-badge');
+    const cartTotal = document.getElementById('cart-total');
+    const payAmount = document.getElementById('pay-amount');
+    const checkoutBtn = document.getElementById('checkout-btn') as HTMLButtonElement;
+
+    if (!cartItems) return;
+
+    const totalCount = store.getCartCount();
+    const totalPrice = store.getCartTotal();
+
+    if (cartBadge) cartBadge.textContent = totalCount.toString();
+    if (cartTotal) cartTotal.textContent = `${totalPrice.toFixed(2)} €`;
+    if (payAmount) payAmount.textContent = `${totalPrice.toFixed(2)} €`;
+
+    if (store.cart.length === 0) {
+      cartItems.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Tu carrito está vacío</p>`;
+      if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.className = "w-full bg-slate-200 text-slate-400 font-bold py-2.5 rounded-xl text-xs transition-all cursor-not-allowed";
+      }
+      return;
+    }
+
+    if (checkoutBtn) {
+      checkoutBtn.disabled = false;
+      checkoutBtn.className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md shadow-indigo-600/20";
+    }
+
+    cartItems.innerHTML = store.cart.map(item => createCartItemHTML(item)).join('');
+  }
+
+  (window as any).addToCart = (id: number) => store.addToCart(id);
+  (window as any).deleteProduct = (id: number) => store.deleteProduct(id);
+  (window as any).updateQuantity = (id: number, qty: number) => store.updateQuantity(id, qty);
+</script>

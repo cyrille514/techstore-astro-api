@@ -1,0 +1,96 @@
+---
+// src/components/PaymentModal.astro
+---
+
+<div id="product-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+    <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+      <h3 class="font-bold text-slate-900 text-lg">Añadir Nuevo Producto</h3>
+      <button id="close-modal-btn" type="button" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+    </div>
+
+    <form id="add-product-form" class="space-y-4 text-xs sm:text-sm">
+      <div>
+        <label for="prod-name" class="block text-slate-600 font-semibold mb-1">Nombre del producto</label>
+        <input 
+          type="text" 
+          id="prod-name" 
+          required 
+          class="w-full border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:border-indigo-500"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="prod-price" class="block text-slate-600 font-semibold mb-1">Precio (€)</label>
+          <input 
+            type="number" 
+            id="prod-price" 
+            step="0.01" 
+            min="0" 
+            required 
+            class="w-full border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label for="prod-stock" class="block text-slate-600 font-semibold mb-1">Stock</label>
+          <input 
+            type="number" 
+            id="prod-stock" 
+            min="1" 
+            required 
+            class="w-full border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="prod-category" class="block text-slate-600 font-semibold mb-1">Categoría</label>
+        <select id="prod-category" class="w-full border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:border-indigo-500 bg-white">
+          <option value="Portátiles">Portátiles</option>
+          <option value="Periféricos">Periféricos</option>
+          <option value="Accesorios">Accesorios</option>
+        </select>
+      </div>
+
+      <!-- CHAMP POUR SELECTIONNER OU IMPORTER L'IMAGE -->
+      <div>
+        <label class="block text-slate-600 font-semibold mb-1">Imagen del Producto</label>
+        
+        <!-- Option 1 : Upload Fichier -->
+        <input 
+          type="file" 
+          id="prod-image-file" 
+          accept="image/*"
+          class="w-full border border-slate-200 rounded-xl p-2 text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition-all mb-2"
+        />
+
+        <p class="text-[10px] text-slate-400 font-medium text-center mb-2">- O bien pega la URL de una imagen -</p>
+
+        <!-- Option 2 : URL d'image -->
+        <input 
+          type="url" 
+          id="prod-image-url" 
+          placeholder="https://ejemplo.com/imagen.jpg"
+          class="w-full border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500"
+        />
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <button 
+          type="button" 
+          id="cancel-modal-btn" 
+          class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-md shadow-indigo-600/20"
+        >
+          Guardar Producto
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
