@@ -2,11 +2,10 @@
 
 const API_BASE_URL = 'https://jsonplaceholder.typicode.com';
 
-// ✏️ LISTE MANUELLE DE VOS PRODUITS
-// Vous pouvez modifier les noms, prix, stocks, catégories et images ici :
+// LISTE MANUELLE DE VOS PRODUITS
 const MANUAL_PRODUCTS = [
   {
-    name: ' laptop Pro',
+    name: 'laptop Pro',
     price: 450.99,
     stock: 5,
     category: 'Portátiles',
@@ -19,7 +18,6 @@ const MANUAL_PRODUCTS = [
     category: 'Portátiles',
     image: '/images/ordenador.avif'
   },
-
   {
     name: 'Ratón Inalámbrico Pro',
     price: 29.99,
@@ -34,7 +32,6 @@ const MANUAL_PRODUCTS = [
     category: 'Periféricos',
     image: '/images/mousse.jpg'
   },
-
   {
     name: 'kit-completo Pro',
     price: 45.99,
@@ -56,8 +53,6 @@ const MANUAL_PRODUCTS = [
     category: 'Periféricos',
     image: '/images/teclado.avif'
   },
-
-
   {
     name: 'Pack Accesorios Complet',
     price: 49.50,
@@ -66,7 +61,7 @@ const MANUAL_PRODUCTS = [
     image: '/images/complet.jpg'
   },
   {
-    name: 'grande Frigo ',
+    name: 'grande Frigo',
     price: 79.90,
     stock: 3,
     category: 'Accesorios',
@@ -93,8 +88,6 @@ const MANUAL_PRODUCTS = [
     category: 'Accesorios',
     image: '/images/menager.avif'
   },
-
-
   {
     name: 'Ventilador Turbo RGB',
     price: 24.99,
@@ -107,26 +100,29 @@ const MANUAL_PRODUCTS = [
 export const apiService = {
   async getProducts() {
     try {
-      // On conserve le fetch vers l'API pour simuler un appel réseau
       const response = await fetch(`${API_BASE_URL}/posts?_limit=${MANUAL_PRODUCTS.length}`);
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
       const data = await response.json();
 
-      // On combine les ID retournés par l'API avec vos données manuelles
       return MANUAL_PRODUCTS.map((product, index) => ({
-        id: data[index] ? data[index].id : index + 1,
+        id: String(data[index] ? data[index].id : index + 1),
         name: product.name,
-        price: product.price,
-        stock: product.stock,
+        nombre: product.name,
+        price: Number(product.price),
+        precio: Number(product.price),
+        stock: Number(product.stock),
         category: product.category,
-        image: product.image
+        image: product.image,
+        imagen: product.image
       }));
     } catch (error) {
       console.error('Erreur getProducts API:', error);
-      // En cas d'erreur réseau, on renvoie tout de même vos produits manuels
       return MANUAL_PRODUCTS.map((product, index) => ({
-        id: index + 1,
-        ...product
+        id: String(index + 1),
+        ...product,
+        nombre: product.name,
+        precio: Number(product.price),
+        imagen: product.image
       }));
     }
   },
