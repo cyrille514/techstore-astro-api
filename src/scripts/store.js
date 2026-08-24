@@ -8,7 +8,8 @@ function showToast(message) {
   if (!container) {
     container = document.createElement('div');
     container.id = 'toast-container';
-    container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none';
+    // Position ajustée à bottom-24 pour passer au-dessus du badge Netlify
+    container.className = 'fixed bottom-24 right-5 z-50 flex flex-col gap-2 pointer-events-none';
     document.body.appendChild(container);
   }
 
@@ -156,5 +157,4 @@ class Store {
 }
 
 export const store = new Store();
-// Exposition globale pour simplifier l'accès depuis le HTML/onClick
 window.store = store;
